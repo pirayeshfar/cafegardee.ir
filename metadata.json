@@ -1,0 +1,6 @@
+{
+  "name": "کافه‌گردی پرو | شبکه باریستاها و کاریابی کافه‌های ایران",
+  "description": "سامانه تخصصی بانک اطلاعاتی باریستاها، رزومه متخصصان قهوه و آگهی‌های استخدامی کافه‌های ایران در cafegardee.ir",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
