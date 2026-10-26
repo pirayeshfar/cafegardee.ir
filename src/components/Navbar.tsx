@@ -1,6 +1,7 @@
 import React from 'react';
-import { Coffee, Plus, Users, Briefcase, Sparkles, Menu, X, Shield, Heart } from 'lucide-react';
-import { SiteSettings } from '../types';
+import { Coffee, Plus, Users, Briefcase, Sparkles, Menu, X, Shield, Heart, User, Bell } from 'lucide-react';
+import { SiteSettings, Barista } from '../types';
+import { toPersianDigits } from '../utils/formatters';
 
 interface NavbarProps {
   activeTab: 'baristas' | 'jobs' | 'cafes' | 'about';
@@ -8,6 +9,9 @@ interface NavbarProps {
   onOpenRegister: (defaultType: 'barista' | 'cafe') => void;
   onOpenAdmin: () => void;
   onOpenDonation: () => void;
+  onOpenBaristaDashboard: () => void;
+  currentBarista: Barista | null;
+  unreadOffersCount: number;
   totalBaristas: number;
   totalJobs: number;
   siteSettings: SiteSettings;
@@ -19,6 +23,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenRegister,
   onOpenAdmin,
   onOpenDonation,
+  onOpenBaristaDashboard,
+  currentBarista,
+  unreadOffersCount,
   totalBaristas,
   totalJobs,
   siteSettings,
@@ -30,7 +37,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-8 h-20">
           
-          {/* Zone 1: Single Brand Wordmark without cluttered subtitle under title */}
+          {/* Zone 1: Brand Wordmark */}
           <div className="flex items-center gap-3 shrink-0">
             <button
               onClick={() => setActiveTab('baristas')}
@@ -61,7 +68,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* Zone 2: Clean Single-Line Nav Links */}
+          {/* Zone 2: Navigation Links */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-medium text-stone-300">
             <button
               onClick={() => setActiveTab('baristas')}
@@ -71,7 +78,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Users className="w-4 h-4" />
               <span>بانک باریستاها</span>
-              <span className="text-xs text-stone-500 font-mono">({totalBaristas})</span>
+              <span className="text-xs text-stone-500 font-mono">({toPersianDigits(totalBaristas)})</span>
             </button>
 
             <button
@@ -82,7 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <Briefcase className="w-4 h-4" />
               <span>فرصت‌های استخدامی</span>
-              <span className="text-xs text-stone-500 font-mono">({totalJobs})</span>
+              <span className="text-xs text-stone-500 font-mono">({toPersianDigits(totalJobs)})</span>
             </button>
 
             <button
@@ -105,10 +112,43 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </nav>
 
-          {/* Zone 3: Actions + Donation + Admin */}
+          {/* Zone 3: Actions + Barista Profile + Donation + Admin */}
           <div className="hidden sm:flex items-center gap-2.5 shrink-0">
             
-            {/* 100% Free Service Badge & Donation Trigger */}
+            {/* Barista Profile Access */}
+            {currentBarista ? (
+              <button
+                onClick={onOpenBaristaDashboard}
+                className="px-3 py-1.5 bg-stone-900 hover:bg-stone-800 border border-stone-700 hover:border-amber-500/50 rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer group"
+                title="مشاهده پیام‌ها و پیشنهادهای کاری شما"
+              >
+                <div className="w-6 h-6 rounded-lg overflow-hidden bg-stone-800 shrink-0 border border-stone-700">
+                  <img
+                    src={currentBarista.avatarUrl}
+                    alt={currentBarista.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <span className="font-bold text-stone-200 group-hover:text-amber-400">
+                  {currentBarista.name.split(' ')[0]}
+                </span>
+                {unreadOffersCount > 0 && (
+                  <span className="w-4 h-4 rounded-full bg-amber-500 text-stone-950 font-bold text-[10px] flex items-center justify-center font-mono">
+                    {toPersianDigits(unreadOffersCount)}
+                  </span>
+                )}
+              </button>
+            ) : (
+              <button
+                onClick={onOpenBaristaDashboard}
+                className="px-3 py-2 text-xs font-semibold text-stone-300 hover:text-amber-300 bg-stone-900 hover:bg-stone-800 border border-stone-800 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <User className="w-3.5 h-3.5 text-amber-500" />
+                <span>ورود باریستا</span>
+              </button>
+            )}
+
+            {/* Donation Trigger */}
             <button
               onClick={onOpenDonation}
               className="px-3 py-2 text-xs font-semibold text-rose-300 hover:text-rose-200 bg-rose-950/40 hover:bg-rose-950/70 border border-rose-800/50 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
@@ -124,7 +164,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="px-4 py-2 text-xs font-bold text-stone-950 bg-amber-500 hover:bg-amber-400 rounded-lg transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap shrink-0 cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>ثبت رایگان رزومه یا آگهی</span>
+              <span>ثبت رایگان</span>
             </button>
 
             {/* Admin Login button */}
@@ -140,6 +180,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile menu trigger */}
           <div className="flex md:hidden items-center gap-2">
             <button
+              onClick={onOpenBaristaDashboard}
+              className="p-2 text-amber-400 bg-stone-900 border border-stone-800 rounded-lg relative"
+              title="پروفایل باریستا"
+            >
+              <User className="w-4 h-4" />
+              {unreadOffersCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-500 text-stone-950 font-bold text-[9px] flex items-center justify-center">
+                  {toPersianDigits(unreadOffersCount)}
+                </span>
+              )}
+            </button>
+            <button
               onClick={onOpenDonation}
               className="p-2 text-rose-400 bg-rose-950/40 border border-rose-800/50 rounded-lg"
               title="حمایت مالی"
@@ -150,7 +202,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onClick={() => onOpenRegister('barista')}
               className="px-2.5 py-1.5 text-[11px] font-bold text-stone-950 bg-amber-500 rounded-lg"
             >
-              + ثبت رایگان
+              + ثبت
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -167,6 +219,26 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-stone-800 bg-stone-950 px-4 py-4 space-y-3">
+          
+          {/* Barista Profile Mobile Bar */}
+          <button
+            onClick={() => {
+              onOpenBaristaDashboard();
+              setMobileMenuOpen(false);
+            }}
+            className="w-full text-right py-2.5 px-3 bg-amber-950/30 border border-amber-800/40 rounded-xl flex items-center justify-between text-xs text-amber-300 font-bold"
+          >
+            <span className="flex items-center gap-2">
+              <User className="w-4 h-4" />
+              {currentBarista ? `پروفایل و پیام‌های ${currentBarista.name}` : 'ورود به پروفایل کاربری باریستا'}
+            </span>
+            {unreadOffersCount > 0 && (
+              <span className="bg-amber-500 text-stone-950 text-[10px] px-1.5 py-0.5 rounded-full">
+                {toPersianDigits(unreadOffersCount)} پیام جدید
+              </span>
+            )}
+          </button>
+
           <button
             onClick={() => {
               setActiveTab('baristas');
@@ -180,7 +252,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Users className="w-4 h-4" />
               بانک باریستاها
             </span>
-            <span className="text-xs font-mono text-stone-500">({totalBaristas})</span>
+            <span className="text-xs font-mono text-stone-500">({toPersianDigits(totalBaristas)})</span>
           </button>
 
           <button
@@ -196,7 +268,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Briefcase className="w-4 h-4" />
               فرصت‌های استخدامی کافه
             </span>
-            <span className="text-xs font-mono text-stone-500">({totalJobs})</span>
+            <span className="text-xs font-mono text-stone-500">({toPersianDigits(totalJobs)})</span>
           </button>
 
           <button
@@ -233,7 +305,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="w-full py-2.5 text-xs font-bold text-center bg-rose-950/50 text-rose-300 border border-rose-800/60 rounded-lg flex items-center justify-center gap-1.5"
             >
               <Heart className="w-4 h-4 fill-rose-400" />
-              <span>حمایت مالی و خرید قهوه برای کافه‌گردی</span>
+              <span>حمایت از ما در حامی‌باش</span>
             </button>
 
             <button

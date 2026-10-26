@@ -14,6 +14,7 @@ import { SendOfferModal } from './components/SendOfferModal';
 import { ApplyJobModal } from './components/ApplyJobModal';
 import { AdminModal } from './components/AdminModal';
 import { DonationModal } from './components/DonationModal';
+import { BaristaDashboardModal } from './components/BaristaDashboardModal';
 import { Footer } from './components/Footer';
 
 export default function App() {
@@ -96,7 +97,31 @@ export default function App() {
     return [];
   });
 
+  // Current Logged-in Barista for Personal Dashboard & Inbox
+  const [currentBarista, setCurrentBarista] = useState<Barista | null>(() => {
+    try {
+      const saved = localStorage.getItem('cafegardee_current_barista');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {
+      console.error(e);
+    }
+    return null;
+  });
+
+  const [baristaDashboardOpen, setBaristaDashboardOpen] = useState(false);
+
   // Sync state to LocalStorage
+  useEffect(() => {
+    try {
+      if (currentBarista) {
+        localStorage.setItem('cafegardee_current_barista', JSON.stringify(currentBarista));
+      } else {
+        localStorage.removeItem('cafegardee_current_barista');
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, [currentBarista]);
   useEffect(() => {
     try {
       localStorage.setItem('cafegardee_site_settings', JSON.stringify(siteSettings));
@@ -214,6 +239,47 @@ export default function App() {
     );
   };
 
+  // Barista Authentication & Dashboard Handlers
+  const handleBaristaLogin = (phone: string): boolean => {
+    const cleanInput = phone.replace(/[\s\-\+]/g, '');
+    const found = baristas.find((b) => {
+      const cleanB = b.phone.replace(/[\s\-\+]/g, '');
+      return cleanB.includes(cleanInput) || cleanInput.includes(cleanB);
+    });
+    if (found) {
+      setCurrentBarista(found);
+      return true;
+    }
+    return false;
+  };
+
+  const handleBaristaLogout = () => {
+    setCurrentBarista(null);
+  };
+
+  const handleUpdateBarista = (updated: Barista) => {
+    setBaristas((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+    setCurrentBarista(updated);
+    if (selectedBaristaForModal?.id === updated.id) {
+      setSelectedBaristaForModal(updated);
+    }
+  };
+
+  // Direct offers & applications targeted to the current logged-in barista
+  const baristaOffers = currentBarista
+    ? directOffers.filter((o) => o.baristaId === currentBarista.id)
+    : [];
+
+  const baristaApplications = currentBarista
+    ? applications.filter(
+        (a) =>
+          a.baristaPhone.replace(/[\s\-\+]/g, '') === currentBarista.phone.replace(/[\s\-\+]/g, '') ||
+          a.baristaName.trim() === currentBarista.name.trim()
+      )
+    : [];
+
+  const unreadOffersCount = baristaOffers.length;
+
   const handleExportData = () => {
     const backup = {
       domain: 'cafegardee.ir',
@@ -254,6 +320,9 @@ export default function App() {
         onOpenRegister={handleOpenRegister}
         onOpenAdmin={() => setAdminModalOpen(true)}
         onOpenDonation={() => setDonationModalOpen(true)}
+        onOpenBaristaDashboard={() => setBaristaDashboardOpen(true)}
+        currentBarista={currentBarista}
+        unreadOffersCount={unreadOffersCount}
         totalBaristas={baristas.length}
         totalJobs={jobs.length}
         siteSettings={siteSettings}
@@ -348,6 +417,25 @@ export default function App() {
         defaultType={registerDefaultType}
         onAddBarista={handleAddBarista}
         onAddJob={handleAddJob}
+        onLoginBarista={(barista) => {
+          setCurrentBarista(barista);
+        }}
+      />
+
+      {/* Barista Dashboard & Offers Inbox Modal */}
+      <BaristaDashboardModal
+        isOpen={baristaDashboardOpen}
+        onClose={() => setBaristaDashboardOpen(false)}
+        currentBarista={currentBarista}
+        onLogin={handleBaristaLogin}
+        onLogout={handleBaristaLogout}
+        onUpdateBarista={handleUpdateBarista}
+        offers={baristaOffers}
+        applications={baristaApplications}
+        onOpenRegister={() => {
+          setBaristaDashboardOpen(false);
+          handleOpenRegister('barista');
+        }}
       />
 
       {/* Send Job Offer to Barista Modal */}

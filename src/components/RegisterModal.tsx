@@ -9,6 +9,7 @@ interface RegisterModalProps {
   defaultType: 'barista' | 'cafe';
   onAddBarista: (barista: Barista) => void;
   onAddJob: (job: JobListing) => void;
+  onLoginBarista?: (barista: Barista) => void;
 }
 
 const DEFAULT_MALE_AVATAR = '/src/assets/images/barista_portrait_male_1793000894818.jpg';
@@ -20,6 +21,7 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
   defaultType,
   onAddBarista,
   onAddJob,
+  onLoginBarista,
 }) => {
   const [activeTab, setActiveTab] = useState<'barista' | 'cafe'>(defaultType);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -120,7 +122,10 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({
     };
 
     onAddBarista(newBarista);
-    setSuccessMessage('پروفایل و رزومه شما به صورت ۱۰۰٪ رایگان در بانک باریستاهای کافه‌گردی پرو ثبت شد!');
+    if (onLoginBarista) {
+      onLoginBarista(newBarista);
+    }
+    setSuccessMessage('پروفایل و رزومه شما ثبت شد و به صورت خودکار به میز کار شخصی خود وارد شدید!');
     setTimeout(() => {
       setSuccessMessage(null);
       onClose();
