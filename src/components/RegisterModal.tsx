@@ -12,8 +12,8 @@ interface RegisterModalProps {
   onLoginBarista?: (barista: Barista) => void;
 }
 
-const DEFAULT_MALE_AVATAR = '/src/assets/images/barista_portrait_male_1793000894818.jpg';
-const DEFAULT_FEMALE_AVATAR = '/src/assets/images/barista_portrait_female_1793000895598.jpg';
+const DEFAULT_MALE_AVATAR = '/images/barista_male.jpg';
+const DEFAULT_FEMALE_AVATAR = '/images/barista_female.jpg';
 
 export const RegisterModal: React.FC<RegisterModalProps> = ({
   isOpen,

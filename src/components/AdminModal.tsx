@@ -111,7 +111,7 @@ export const AdminModal: React.FC<AdminModalProps> = ({
       tagline: newCafeTagline || 'اسپرسو بار و قهوه تخصصی موج سوم',
       city: newCafeCity,
       neighborhood: 'مرکز شهر',
-      featuredImageUrl: '/src/assets/images/hero_coffee_bar_1793000893504.jpg',
+      featuredImageUrl: '/images/hero_coffee_bar.jpg',
       specialtyCoffee: 'دانه‌های تازه برشته شده',
       machine: 'La Marzocco Linea',
       discountOffer: newCafeOffer || 'تخفیف ویژه اعضای کافه‌گردی',

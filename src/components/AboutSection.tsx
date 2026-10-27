@@ -63,7 +63,7 @@ export const AboutSection: React.FC<AboutSectionProps> = ({
         <div className="lg:col-span-5">
           <div className="relative rounded-3xl overflow-hidden border border-stone-800 shadow-2xl">
             <img
-              src="/src/assets/images/latte_art_pour_1793000896223.jpg"
+              src="/images/latte_art_pour.jpg"
               alt="پور دقیق لاته آرت توسط باریستای حرفه‌ای"
               referrerPolicy="no-referrer"
               className="w-full h-80 sm:h-96 object-cover object-center filter saturate-[0.95]"

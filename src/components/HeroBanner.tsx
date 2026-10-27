@@ -30,7 +30,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       {/* Background Hero Image with measured contrast scrim */}
       <div className="absolute inset-0 z-0">
         <img
-          src="/src/assets/images/hero_coffee_bar_1793000893504.jpg"
+          src="/images/hero_coffee_bar.jpg"
           alt="فضای کافه تخصصی و بار اسپرسو"
           referrerPolicy="no-referrer"
           className="w-full h-full object-cover object-center filter brightness-[0.32] saturate-[0.85]"

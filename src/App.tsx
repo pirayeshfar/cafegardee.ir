@@ -43,11 +43,25 @@ export default function App() {
     return DEFAULT_SITE_SETTINGS;
   });
 
+  // Helper to sanitize any legacy image URLs from previous localStorage saves
+  const sanitizeImgUrl = (url?: string): string => {
+    if (!url) return '';
+    return url
+      .replace('/src/assets/images/barista_portrait_male_1793000894818.jpg', '/images/barista_male.jpg')
+      .replace('/src/assets/images/barista_portrait_female_1793000895598.jpg', '/images/barista_female.jpg')
+      .replace('/src/assets/images/hero_coffee_bar_1793000893504.jpg', '/images/hero_coffee_bar.jpg')
+      .replace('/src/assets/images/latte_art_pour_1793000896223.jpg', '/images/latte_art_pour.jpg')
+      .replace('/src/assets/images/', '/images/');
+  };
+
   // Sponsored Cafes Ads with live smart needs
   const [sponsoredCafes, setSponsoredCafes] = useState<SponsoredCafe[]>(() => {
     try {
       const saved = localStorage.getItem('cafegardee_sponsored_cafes');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: SponsoredCafe[] = JSON.parse(saved);
+        return parsed.map((c) => ({ ...c, featuredImageUrl: sanitizeImgUrl(c.featuredImageUrl) }));
+      }
     } catch (e) {
       console.error(e);
     }
@@ -58,7 +72,10 @@ export default function App() {
   const [baristas, setBaristas] = useState<Barista[]>(() => {
     try {
       const saved = localStorage.getItem('cafegardee_baristas');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: Barista[] = JSON.parse(saved);
+        return parsed.map((b) => ({ ...b, avatarUrl: sanitizeImgUrl(b.avatarUrl) }));
+      }
     } catch (e) {
       console.error('Failed to load baristas from storage', e);
     }
@@ -101,7 +118,10 @@ export default function App() {
   const [currentBarista, setCurrentBarista] = useState<Barista | null>(() => {
     try {
       const saved = localStorage.getItem('cafegardee_current_barista');
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        const parsed: Barista = JSON.parse(saved);
+        return { ...parsed, avatarUrl: sanitizeImgUrl(parsed.avatarUrl) };
+      }
     } catch (e) {
       console.error(e);
     }
